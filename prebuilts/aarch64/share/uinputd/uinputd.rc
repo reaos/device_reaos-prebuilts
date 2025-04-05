@@ -1,0 +1,6 @@
+service vendor.uinputd /vendor/bin/uinputd
+    onrestart restart zygote
+    disabled
+
+on property:ro.boot.use_reaos_stream=1
+    start vendor.uinputd
