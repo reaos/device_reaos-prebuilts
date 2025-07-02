@@ -76,14 +76,6 @@ $(foreach lib,$(libs),\
 # DRI
 dri_libs := libgallium_dri
 drv_libs := libgallium_drv_video
-ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH),x86 x86_64))
-$(eval $(call define-reaos-prebuilt-lib,libigdgmm,,libigdgmm.so))
-drv_libs_intel := i965_drv_video iHD_drv_video
-$(foreach lib,$(drv_libs_intel),\
-    $(eval $(call define-reaos-prebuilt-lib,$(lib),,dri/$(lib).so,dri,,libigdgmm)))
-
-drv_libs += $(drv_libs_intel)
-endif
 dri_links := $(shell cd $(LOCAL_PATH)/prebuilts/$(TARGET_ARCH)/lib/dri && find * -name '*_dri.so' -type l)
 drv_links := $(shell cd $(LOCAL_PATH)/prebuilts/$(TARGET_ARCH)/lib/dri && find * -name '*_drv_video.so' -type l)
 $(eval $(call define-reaos-prebuilt-lib,libgallium_dri,,dri/libgallium_dri.so,dri,$(dri_links)))
@@ -102,13 +94,6 @@ drm_libs := $(shell cd $(LOCAL_PATH)/prebuilts/$(TARGET_ARCH)/lib && find * -nam
 libs += $(drm_libs)
 $(foreach lib,$(libs),\
     $(eval $(call define-reaos-prebuilt-lib,$(lib),$(lib))))
-
-
-## VA
-va_libs := libva.so.2 libva-drm.so.2
-$(foreach lib,$(va_libs),\
-    $(eval $(call define-reaos-prebuilt-lib,$(lib),$(lib),,,,$(drv_libs) $(drm_libs))))
-
 
 ## LLVM
 llvm_libs := $(shell cd $(LOCAL_PATH)/prebuilts/$(TARGET_ARCH)/lib && find * -name 'libLLVM*' -type f)
@@ -179,11 +164,6 @@ LOCAL_INIT_RC := prebuilts/$$(TARGET_ARCH)/share/$3
 endif
 include $$(BUILD_PREBUILT)
 endef
-
-# vaapi
-bins:=avcenc h264encode hevcencode jpegenc vp8enc vp9enc vainfo
-$(foreach i,$(bins),\
-    $(eval $(call define-reaos-prebuilt-bin,$(i),$(va_libs))))
 
 $(eval $(call define-reaos-prebuilt-bin,uinputd,$(evdev_libs),uinputd/uinputd.rc))
 
